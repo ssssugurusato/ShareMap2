@@ -1,10 +1,14 @@
 package com.example.sharemap2;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -20,7 +24,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static GoogleMap mMap;
-    private TextView mTextMessage;
+    private fragment_person mfragment_person;
+    private fragment_search_root mfragment_search_root;
+    private fragment_upload_root mfragment_upload_root;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -28,23 +34,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public boolean onNavigationItemSelected(@NonNull MenuItem Item) {
             switch(Item.getItemId()){
                 case R.id.navigation_upload:
-                    Fragment fragment=new fragment_upload_root();
-                    FragmentTransaction transaction=getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.content,fragment);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
+                    FragmentTransaction transaction1=getSupportFragmentManager().beginTransaction();
+                    transaction1.replace(R.id.map,mfragment_upload_root);
+                    transaction1.addToBackStack(null);
+                    transaction1.commit();
                     return true;
                 case R.id.navigation_search:
-                    Fragment fragment2=new fragment_search_root();
                     FragmentTransaction transaction2=getSupportFragmentManager().beginTransaction();
-                    transaction2.replace(R.id.content,fragment2);
+                    transaction2.replace(R.id.map,mfragment_search_root);
                     transaction2.addToBackStack(null);
                     transaction2.commit();
                     return true;
                 case R.id.navigation_person:
-                    Fragment fragment3=new fragment_person();
                     FragmentTransaction transaction3=getSupportFragmentManager().beginTransaction();
-                    transaction3.replace(R.id.content,fragment3);
+                    transaction3.replace(R.id.map,mfragment_person);
                     transaction3.addToBackStack(null);
                     transaction3.commit();
                     return true;
@@ -54,18 +57,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     };
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mfragment_upload_root=new fragment_upload_root();
+        mfragment_search_root=new fragment_search_root();
+        mfragment_person=new fragment_person();
 
-       setContentView(R.layout.activity_maps);
+        setContentView(R.layout.layout_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-
-        setContentView(R.layout.layout_main);
         BottomNavigationView navView=findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -81,14 +86,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * installed Google Play services and returned to the app.
      */
 
-
+   @Override
     public  void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.setMyLocationEnabled(true);
     }
+
+
+
 
 }

@@ -4,19 +4,16 @@
     <item
         android:id="@+id/navigation_upload"
         android:icon="@drawable/ic_file_upload_black_24dp"
-        android:onClick="onClickUpload"
         android:title="Upload"/>
 
     <item
         android:id="@+id/navigation_search"
         android:icon="@drawable/ic_search_black_24dp"
-        android:onClick="onClickSearch"
         android:title="Search"/>
 
     <item
         android:id="@+id/navigation_person"
         android:icon="@drawable/ic_person_black_24dp"
-        android:onClick="onClickPerson"
         android:title="MyPage"/>
 
 </menu>
