@@ -1,7 +1,5 @@
 package com.example.sharemap2;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -19,7 +17,7 @@ public class fragment_person extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_fragment_person, container, false);
+        return inflater.inflate(R.layout.fragment_person, container, false);
     }
 
 
