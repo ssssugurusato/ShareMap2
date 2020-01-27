@@ -33,6 +33,8 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -41,7 +43,7 @@ import java.util.List;
 
 
 public class fragment_upload_root extends Fragment implements OnMapReadyCallback, LocationListener,
-        View.OnClickListener,CompoundButton.OnCheckedChangeListener {
+        View.OnClickListener,CompoundButton.OnCheckedChangeListener, GoogleMap.OnMarkerClickListener {
 
     private static LocationManager locationmanager1;
     private static GoogleMap mMap;
@@ -55,7 +57,10 @@ public class fragment_upload_root extends Fragment implements OnMapReadyCallback
     private List<LatLng> mRunList = new ArrayList<LatLng>();
     private LatLng latlong, latlong2;
     private static Location location1;
-    private static Button mButton;
+    private static Button mButton, mButton2;
+    private Marker userMark;
+    private List<Marker> mMakerList=new ArrayList<Marker>();
+
 
 
     @Override
@@ -126,7 +131,9 @@ public class fragment_upload_root extends Fragment implements OnMapReadyCallback
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 19));
 
             mButton=(Button)getActivity().findViewById(R.id.button) ;
+            mButton2=(Button)getActivity().findViewById(R.id.button2) ;
             mButton.setOnClickListener(this);
+            mButton2.setOnClickListener(this);
 
             //プロバイダーに基づいた リスナー を登録する
             //最低0秒、最低0mで発火、これより細かい更新はされない
@@ -145,6 +152,10 @@ public class fragment_upload_root extends Fragment implements OnMapReadyCallback
                     locationmanager1.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
                     locationmanager1.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, this);
                 }
+            case R.id.button2:
+               Log.d("aa","aaaaa");
+
+
                 break;
         }
     }
@@ -198,7 +209,21 @@ public class fragment_upload_root extends Fragment implements OnMapReadyCallback
 
         TextView text=(TextView)getActivity().findViewById(R.id.textView1);
         text.setText(latlong2.toString());
+        //locationが変わるごとにマークをついか
+        userMark = mMap.addMarker(new MarkerOptions()
+                .position(latlong2)
+                .title("user point"));
+        //userMark.setTag(0);
+        mMakerList.add(userMark);
+        Log.d("count", "mMarkerList.length.toString");
+        // Set a listener for marker click.
+        mMap.setOnMarkerClickListener(this);
         drawTrace(latlong2);
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+        return true;
     }
 
     @Override
