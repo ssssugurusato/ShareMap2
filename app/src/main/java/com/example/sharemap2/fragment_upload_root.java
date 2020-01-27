@@ -111,7 +111,7 @@ public class fragment_upload_root extends Fragment implements OnMapReadyCallback
 
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
-        Log.d("a","OKabc");
+
 
         if (ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[0]) == GRANTED ||
                 ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[1]) == GRANTED) {
@@ -152,6 +152,7 @@ public class fragment_upload_root extends Fragment implements OnMapReadyCallback
                     locationmanager1.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
                     locationmanager1.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, this);
                 }
+                break;
             case R.id.button2:
                 locationmanager1.removeUpdates(this);
                 break;
@@ -210,10 +211,12 @@ public class fragment_upload_root extends Fragment implements OnMapReadyCallback
         //locationが変わるごとにマークをついか
         userMark = mMap.addMarker(new MarkerOptions()
                 .position(latlong2)
-                .title("user point"));
+                .title("user point")
+                .draggable(true));
         //userMark.setTag(0);
+
         mMakerList.add(userMark);
-        Log.d("count", "mMarkerList.length.toString");
+        Log.d("count", "mMarkerList-commitしたよ");
         // Set a listener for marker click.
         mMap.setOnMarkerClickListener(this);
         drawTrace(latlong2);
