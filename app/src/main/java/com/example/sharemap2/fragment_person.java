@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 public class fragment_person extends Fragment {
 
 
-
+    //Hellow
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
