@@ -153,9 +153,7 @@ public class fragment_upload_root extends Fragment implements OnMapReadyCallback
                     locationmanager1.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, this);
                 }
             case R.id.button2:
-               Log.d("aa","aaaaa");
-
-
+                locationmanager1.removeUpdates(this);
                 break;
         }
     }
