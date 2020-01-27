@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "741523318439",
+    "firebase_url": "https://sharemap2.firebaseio.com",
+    "project_id": "sharemap2",
+    "storage_bucket": "sharemap2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741523318439:android:afb905d440f858036f9d82",
+        "android_client_info": {
+          "package_name": "com.example.sharemap2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741523318439-hfl43fbierl14nmu55hj3vrms0m0sglb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaVQu_C9b3bL-du8IRIeA-Ct35U1FbYgQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "741523318439-hfl43fbierl14nmu55hj3vrms0m0sglb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
