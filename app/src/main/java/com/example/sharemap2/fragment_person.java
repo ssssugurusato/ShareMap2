@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 
 public class fragment_person extends Fragment {
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
