@@ -21,20 +21,20 @@ public class LocationData {
 
     public LocationData() {}
 
-    public LocationData(String tag, double latitude, double longitude,double accuracy, String created_at) {
-        this.title = tag;
+    public LocationData(String title, double latitude, double longitude,double accuracy, String created_at) {
+        this.title = title;
         this.latitude = latitude;
         this.longitude = longitude;
         this.accuracy = accuracy;
         this.created_at = created_at;
     }
 
-    public String getTag() {
+    public String getTitle() {
         return title;
     }
 
-    public void setTag(String tag) {
-        this.title = tag;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public double getLatitude() {
