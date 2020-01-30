@@ -230,12 +230,15 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         //LatLng curr = new LatLng(location.getLatitude(), location.getLongitude());
         //mMap.animateCamera(CameraUpdateFactory.newLatLng(curr));
 
+        //位置情報とそれに関連する情報の取得
         latlong2=LatLngGet(location);
+        accuracy = location.getAccuracy();
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
         String currentTime = sdf.format(location.getTime());
         created_at = currentTime;
 
+        //データベースへの書き込みを実行
         writeToDatabase(latlong2, accuracy, created_at);
 
         mRunList.add(latlong2);
