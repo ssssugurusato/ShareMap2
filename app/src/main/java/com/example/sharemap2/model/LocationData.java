@@ -11,20 +11,23 @@ public class LocationData {
     public static final String FIELD_LATLNG = "latlng";
     public static final String FIELD_ACCURACY = "accuracy";
     public static final String FIELD_CREATE_AT = "created_at";
+    public static final String FIELD_UID = "uid";
 
 
     public String title;
     public LatLng latlng;
     public double accuracy;
     public String created_at;
+    public String uid;
 
-    public LocationData(String title, LatLng latlong, double accuracy, String created_at, String uid) {}
+    public LocationData() {}
 
-    public LocationData(String title, LatLng latlng, double accuracy, String created_at) {
+    public LocationData(String title, LatLng latlng, double accuracy, String created_at, String uid) {
         this.title = title;
         this.latlng = latlng;
         this.accuracy = accuracy;
         this.created_at = created_at;
+        this.uid = uid;
     }
 
     public String getTitle() {
@@ -57,6 +60,14 @@ public class LocationData {
 
     public void setCreated_at(String created_at) {
         this.created_at = created_at;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }
 
