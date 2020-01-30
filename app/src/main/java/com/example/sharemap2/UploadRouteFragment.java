@@ -231,6 +231,13 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         //mMap.animateCamera(CameraUpdateFactory.newLatLng(curr));
 
         latlong2=LatLngGet(location);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
+        String currentTime = sdf.format(location.getTime());
+        created_at = currentTime;
+
+        writeToDatabase(latlong2, accuracy, created_at);
+
         mRunList.add(latlong2);
         //locationが変わるごとにマークをついか
         userMark = mMap.addMarker(new MarkerOptions()
@@ -330,7 +337,7 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         final String title = startDate;
         final String uid = getUid();
 
-        LocationData location = new LocationData(title, latlong, accuracy, created_at, uid);
+        LocationData location = new LocationData(title, latlng, accuracy, created_at, uid);
 
 // Add a new document with a generated ID
         mDatabase.collection("locations")
