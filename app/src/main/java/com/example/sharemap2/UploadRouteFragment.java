@@ -29,6 +29,7 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.sharemap2.model.LocationData;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -38,9 +39,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
@@ -73,6 +83,13 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
             "Kurumi",
             "Tomoya"
     };
+
+    private FirebaseFirestore mDatabase = FirebaseFirestore.getInstance();
+    private String startDate;
+    private double accuracy;
+    private String created_at;
+    private String TAG1 = "Recording current location";
+    private String TAG2 = "Recording root";
 
     @Deprecated
     @CallSuper
@@ -186,6 +203,8 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
                         ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[1]) == GRANTED) {
                     locationmanager1.requestLocationUpdates(GPS_PROVIDER, 5000, 0, this);
                     locationmanager1.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, this);
+
+                    startDate = getNowDate();
                 }
                 break;
             case R.id.button2:
@@ -244,7 +263,12 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         double lat = location.getLatitude();
         double lon = location.getLongitude();
         latlong2 = new LatLng(lat, lon);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
+        String currentTime = sdf.format(location.getTime());
+        created_at = currentTime;
 
+        writeToDatabase(latlong2, accuracy, created_at);
 
 
         //locationが変わるごとにマークをついか
@@ -295,6 +319,57 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         polyOptions.geodesic(false);
         mMap.addPolyline(polyOptions);
 
+    }
+
+    private void writeToDatabase(LatLng latlng, double accuracy, String created_at) {
+        final String title = startDate;
+        final String uid = getUid();
+
+        LocationData location = new LocationData(title, latlong, accuracy, created_at, uid);
+
+// Add a new document with a generated ID
+        mDatabase.collection("locations")
+                .add(location)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG1, "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG1, "Error adding document", e);
+                    }
+                });
+
+        mDatabase.collection("roots").document(uid)
+                .collection(title)
+                .add(location)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG2, "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG2, "Error adding document", e);
+                    }
+                });
+
+
+    }
+
+    public static String getNowDate(){
+        final DateFormat df = new SimpleDateFormat("yyyy.MM.dd.HH:mm:ss");
+        final Date date = new Date(System.currentTimeMillis());
+        return df.format(date);
+    }
+
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
 }
