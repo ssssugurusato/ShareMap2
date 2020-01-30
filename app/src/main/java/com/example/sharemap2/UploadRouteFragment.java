@@ -203,7 +203,6 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
                         ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[1]) == GRANTED) {
                     locationmanager1.requestLocationUpdates(GPS_PROVIDER, 5000, 0, this);
                     locationmanager1.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, this);
-
                     startDate = getNowDate();
                 }
                 break;
