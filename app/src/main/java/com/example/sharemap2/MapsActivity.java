@@ -12,7 +12,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MapsActivity extends FragmentActivity
         {
 
-
     private PersonFragment mfragment_person;
     private SearchRouteFragment mfragment_search_root;
     private UploadRouteFragment mfragment_upload_root;
