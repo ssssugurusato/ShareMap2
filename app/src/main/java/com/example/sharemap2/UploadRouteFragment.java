@@ -23,9 +23,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -69,20 +71,17 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
     private List<LatLng> mRunList = new ArrayList<LatLng>();
     private LatLng latlong, latlong2;
     private static Location location1;
-    private Button mButton, mButton2;
+    private Button mButton, mButton2, mButton3;
     private Marker userMark;
-    private List<Marker> mMakerList = new ArrayList<Marker>();
+    // ListViewに表示する項目を生成
+    private ArrayList<Marker> mMarkerList= new ArrayList<>();
 
     private ListView mapInfoLayout;
     String provider;
     private MapsActivity mactivity = null;
     double lat;
     double lon;
-    private static final String[] names = {
-            "Yuka",
-            "Kurumi",
-            "Tomoya"
-    };
+    private  ListView listView;
 
     private FirebaseFirestore mDatabase = FirebaseFirestore.getInstance();
     private String startDate;
@@ -111,7 +110,6 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         super.onActivityCreated(savedInstanceState);
         locationmanager1 = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
-
         if (ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[0]) != GRANTED &&
                 ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[1]) != GRANTED) {
             // ↓「アクセスを許可しますか？」
@@ -129,7 +127,6 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
     private void startLocation() {
         if (ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[0]) == GRANTED ||
                 ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[1]) == GRANTED) {
-            Log.d("tag", "Null-bbbbbbbbbbbbbbbbbbbbbbbbbb");
             // 許可を得られたことを確認できた段階で初めてsetContentView()を呼ぶ
             // onMapReady()が走るのはこれ以後になる
             //FusedLocationProviderClient mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -137,14 +134,7 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
             mapFragment.getMapAsync(this);
 
             // ListViewのインスタンスを生成
-            ListView listView = getActivity().findViewById(R.id.mapInfoLayout);
-            // BaseAdapter を継承したadapterのインスタンスを生成
-            // レイアウトファイル list_items.xml を
-            // activity_main.xml に inflate するためにadapterに引数として渡す
-            BaseAdapter adapter = new EditListAdapter(getContext(),
-                    R.layout.list_items, names);
-            // ListViewにadapterをセット
-            listView.setAdapter(adapter);
+           listView = getActivity().findViewById(R.id.mapInfoLayout);
 
         }
     }
@@ -187,7 +177,7 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
     private LatLng LatLngGet(Location location){
         if (ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[0]) == GRANTED ||
                 ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[1]) == GRANTED) {
-            location = locationmanager1.getLastKnownLocation(provider);
+
             lat = location.getLatitude();
             lon = location.getLongitude();
             latlong = new LatLng(lat, lon);
@@ -206,16 +196,85 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
                     startDate = getNowDate();
                 }
                 break;
+
             case R.id.button2:
                 locationmanager1.removeUpdates(this);
                 mapInfoLayout = getActivity().findViewById(R.id.mapInfoLayout);
+                mButton3=getActivity().findViewById(R.id.button3);
                 mapInfoLayout.setVisibility(View.VISIBLE);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLngGet(locationmanager1.getLastKnownLocation(provider)), 10));
+                mButton.setVisibility(View.GONE);
+                mButton2.setVisibility(View.GONE);
+                mButton3.setVisibility(View.VISIBLE);
 
-                break;
-        }
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLngGet(locationmanager1.getLastKnownLocation(provider)), 10));
+                // BaseAdapter を継承したadapterのインスタンスを生成
+                // レイアウトファイル list_items.xml を
+                // activity_main.xml に inflate するためにadapterに引数として渡す
+                final BaseAdapter adapter = new EditListAdapter(getContext(), R.layout.list_items, mMarkerList);
+                // ListViewにadapterをセット
+                listView.setAdapter(adapter);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        getActivity().setContentView(R.layout.memo_add);
+                        EditText mEdit=getActivity().findViewById(R.id.editText);
+                        mEdit.getText().toString();
+                    }
+                });
+           }
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        //LatLng curr = new LatLng(location.getLatitude(), location.getLongitude());
+        //mMap.animateCamera(CameraUpdateFactory.newLatLng(curr));
+
+        latlong2=LatLngGet(location);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
+        String currentTime = sdf.format(location.getTime());
+        created_at = currentTime;
+
+        writeToDatabase(latlong2, accuracy, created_at);
+
+        mRunList.add(latlong2);
+        //locationが変わるごとにマークをついか
+        userMark = mMap.addMarker(new MarkerOptions()
+                .position(latlong2)
+                .title(latlong2.toString())
+                .draggable(true));
+        //userMark.setTag(0);
+        mMarkerList.add(userMark);
+
+        drawTrace(latlong2);
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+        return true;
+    }
+
+
+    //mRunListの緯度経度のリストをポリラインオプションの要素に加える
+    private void drawTrace(LatLng latlng) {
+
+        // Set a listener for marker click.
+        mMap.setOnMarkerClickListener(this);
+        PolylineOptions polyOptions = new PolylineOptions();
+        for (LatLng polyLatLng : mRunList) {
+            polyOptions.add(polyLatLng);
+        }
+        polyOptions.color(Color.BLUE);
+        polyOptions.width(4);
+        polyOptions.geodesic(false);
+        mMap.addPolyline(polyOptions);
+    }
+
+    /*------------------------------------------------------------------------------------
+      以下はメインスレッドとはあまり関係ない処理!!!!!!!!!!!!!
+     -------------------------------------------------------------------------------------*/
+
+    // permissionが未設定時のコールバック関数
     // アクセス許可のダイアログで操作を行ったときに呼ばれるメソッド
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -228,9 +287,24 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
                 getActivity().finish();
             }
         }
-
     }
 
+    //以下はロケーションリスナーインタフェースのonLocationChanged以外のあまり使用しないけど書かなきゃいけないやつまとめ
+    @Override
+    public void onProviderEnabled(String s) {
+        Log.d("Tag", "enable");
+    }
+
+    //ロケーションプロバイダが利用不可能になるとコールバックされる
+    @Override
+    public void onProviderDisabled(String s) {
+        Log.d("Tag", "provider,disable");
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+    }
 
     @Override
     public void onDestroy() {
@@ -254,77 +328,15 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        //LatLng curr = new LatLng(location.getLatitude(), location.getLongitude());
-        //mMap.animateCamera(CameraUpdateFactory.newLatLng(curr));
-
-        double lat = location.getLatitude();
-        double lon = location.getLongitude();
-        latlong2 = new LatLng(lat, lon);
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm:ss");
-        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
-        String currentTime = sdf.format(location.getTime());
-        created_at = currentTime;
-
-        writeToDatabase(latlong2, accuracy, created_at);
-
-
-        //locationが変わるごとにマークをついか
-        userMark = mMap.addMarker(new MarkerOptions()
-                .position(latlong2)
-                .title("user point")
-                .draggable(true));
-        //userMark.setTag(0);
-
-        mMakerList.add(userMark);
-        Log.d("count", "mMarkerList-commitしたよ");
-        // Set a listener for marker click.
-        mMap.setOnMarkerClickListener(this);
-        drawTrace(latlong2);
-    }
-
-    @Override
-    public boolean onMarkerClick(final Marker marker) {
-        return true;
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-        Log.d("Tag", "enable");
-    }
-
-    //ロケーションプロバイダが利用不可能になるとコールバックされる
-    @Override
-    public void onProviderDisabled(String s) {
-        Log.d("Tag", "provider,disable");
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-    }
-
-    //mRunListの緯度経度のリストをポリラインオプションの要素に加える
-    private void drawTrace(LatLng latlng) {
-        mRunList.add(latlng);
-        PolylineOptions polyOptions = new PolylineOptions();
-        for (LatLng polyLatLng : mRunList) {
-            polyOptions.add(polyLatLng);
-        }
-
-        polyOptions.color(Color.BLUE);
-        polyOptions.width(4);
-        polyOptions.geodesic(false);
-        mMap.addPolyline(polyOptions);
-
-    }
+     /*------------------------------------------------------------------------------------
+      以上がメインスレッドとはあまり関係ない処理!!!!!!!!!!!!!!!!!!!!!
+     -------------------------------------------------------------------------------------*/
 
     private void writeToDatabase(LatLng latlng, double accuracy, String created_at) {
         final String title = startDate;
         final String uid = getUid();
 
-        LocationData location = new LocationData(title, latlong, accuracy, created_at, uid);
+        LocationData location = new LocationData(title, latlng, accuracy, created_at, uid);
 
 // Add a new document with a generated ID
         mDatabase.collection("locations")

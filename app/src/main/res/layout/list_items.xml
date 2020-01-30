@@ -5,12 +5,11 @@
 
     <TextView
         android:id="@+id/text_view"
-        android:textColor="#04e"
-        android:textSize="20sp"
-        android:background="#4169e1"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="20dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="10dp"
+        android:textColor="#04e"
+        android:textSize="20sp" />
 
 </LinearLayout>
