@@ -9,10 +9,14 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.Marker;
+
+import java.util.ArrayList;
+
 public class EditListAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private int layoutID;
-    private String[] namelist;
+    private ArrayList<Marker> mMarkerList;
 
 
     static class ViewHolder {
@@ -20,12 +24,10 @@ public class EditListAdapter extends BaseAdapter {
     }
 
     EditListAdapter(Context context, int itemLayoutId,
-                String[] names){
-
+                    ArrayList<Marker> MarkerList){
         inflater = LayoutInflater.from(context);
         layoutID = itemLayoutId;
-
-        namelist = names;
+        mMarkerList= MarkerList;
     }
 
     @Override
@@ -42,16 +44,13 @@ public class EditListAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-
-
-        holder.text.setText(namelist[position]);
-
+        holder.text.setText(mMarkerList.get(position).getTitle());
         return convertView;
     }
 
     @Override
     public int getCount() {
-        return namelist.length;
+        return mMarkerList.size();
     }
 
     @Override

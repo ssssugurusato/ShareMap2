@@ -20,6 +20,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:context=".UploadRouteFragment" />
 
+
     <Button
         android:id="@+id/button"
         android:layout_width="50dp"
@@ -33,27 +34,37 @@
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="wrap_content"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="100dp"
-        android:text="upload"
+        android:background="@drawable/ic_edit_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button" />
 
-    <ListView
-        android:id="@+id/mapInfoLayout"
-        android:layout_width="0dp"
-        android:layout_height="500dp"
-        android:background="#ffff"
-        android:orientation="vertical"
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:text="upload"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <ListView
+        android:id="@+id/mapInfoLayout"
+        android:layout_width="0dp"
+        android:layout_height="500dp"
+        android:color="#ffff"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-
+    </ListView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
