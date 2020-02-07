@@ -1,5 +1,4 @@
 package com.example.sharemap2;
-
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
