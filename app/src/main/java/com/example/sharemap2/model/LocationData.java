@@ -8,23 +8,26 @@ public class LocationData {
 
     public static final String FIELD_DESTINATION = "destination";
     public static final String FIELD_TITLE = "title";
-    public static final String FIELD_LATLNG = "latlng";
+    public static final String FIELD_LATLNG = "latitude";
+    public static final String FIELD_LONGITUDE = "longitude";
     public static final String FIELD_ACCURACY = "accuracy";
     public static final String FIELD_CREATE_AT = "created_at";
     public static final String FIELD_UID = "uid";
 
 
     public String title;
-    public LatLng latlng;
+    public double latitude;
+    public double longitude;
     public double accuracy;
     public String created_at;
     public String uid;
 
     public LocationData() {}
 
-    public LocationData(String title, LatLng latlng, double accuracy, String created_at, String uid) {
+    public LocationData(String title, double latitude, double longitude, double accuracy, String created_at, String uid) {
         this.title = title;
-        this.latlng = latlng;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.accuracy = accuracy;
         this.created_at = created_at;
         this.uid = uid;
@@ -38,12 +41,20 @@ public class LocationData {
         this.title = title;
     }
 
-    public LatLng getLatlng() {
-        return latlng;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 
-    public void setLatlng(LatLng latlng) {
-        this.latlng = latlng;
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 
     public double getAccuracy() {

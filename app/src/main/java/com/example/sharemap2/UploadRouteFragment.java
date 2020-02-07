@@ -240,7 +240,7 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         created_at = currentTime;
 
         //データベースへの書き込みを実行
-        writeToDatabase(latlng2, accuracy, created_at);
+        writeToDatabase(latlng2.latitude, latlng2.longitude, accuracy, created_at);
 
         mRunList.add(latlng2);
         //locationが変わるごとにマークをついか
@@ -338,11 +338,11 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
       以上がメインスレッドとはあまり関係ない処理!!!!!!!!!!!!!!!!!!!!!
      -------------------------------------------------------------------------------------*/
 
-    private void writeToDatabase(LatLng latlng, double accuracy, String created_at) {
+    private void writeToDatabase(double latitude, double longitude, double accuracy, String created_at) {
         final String title = startDate;
         final String uid = getUid();
 
-        LocationData location = new LocationData(title, latlng, accuracy, created_at, uid);
+        LocationData location = new LocationData(title, latitude, longitude, accuracy, created_at, uid);
 
 // Add a new document with a generated ID
         mDatabase.collection("locations")
