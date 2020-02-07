@@ -1,6 +1,5 @@
 package com.example.sharemap2.adapter;
 
-import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.sharemap2.R;
 import com.example.sharemap2.model.LocationData;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
@@ -36,7 +36,7 @@ public class LocationsAdapter extends FirestoreAdapter<LocationsAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-//        return new ViewHolder(inflater.inflate(R.layout.list_location, parent, false));
+        return new ViewHolder(inflater.inflate(R.layout.list_location, parent, false));
     }
 
     @Override
@@ -53,10 +53,10 @@ public class LocationsAdapter extends FirestoreAdapter<LocationsAdapter.ViewHold
 
         public ViewHolder(View itemView) {
             super(itemView);
-//            timeView = itemView.findViewById(R.id.created_at);
-//            accuracyView = itemView.findViewById(R.id.accuracy);
-//            latitudeView = itemView.findViewById(R.id.lat);
-//            longitudeView = itemView.findViewById(R.id.lng);
+            timeView = itemView.findViewById(R.id.created_at);
+            accuracyView = itemView.findViewById(R.id.accuracy);
+            latitudeView = itemView.findViewById(R.id.lat);
+            longitudeView = itemView.findViewById(R.id.lng);
         }
 
         public void bind(final DocumentSnapshot snapshot,
@@ -64,10 +64,10 @@ public class LocationsAdapter extends FirestoreAdapter<LocationsAdapter.ViewHold
 
             LocationData locationData = snapshot.toObject(LocationData.class);
 
-            timeView.setText("計測日時：" + String.format("%.5f", locationData.getCreated_at()));
-            accuracyView.setText("|精度：" + String.format("%.5f", locationData.getAccuracy()));
-            latitudeView.setText("|緯度："+ String.format("%.5f", locationData.getLatlng().latitude));
-            longitudeView.setText("|経度："+ String.format("%.5f", locationData.getLatlng().longitude));
+            timeView.setText(locationData.getCreated_at());
+            accuracyView.setText("|精度：" + locationData.getAccuracy());
+            latitudeView.setText("|緯度："+ locationData.getLatitude());
+            longitudeView.setText("|経度："+ locationData.getLongitude());
 
             // Click listener
             itemView.setOnClickListener(new View.OnClickListener() {
