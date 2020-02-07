@@ -36,11 +36,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -86,6 +90,7 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
     private String created_at;
     private String TAG1 = "Recording current location";
     private String TAG2 = "Recording root";
+    private String TAG3 = "Firestore";
     private EditWindowFragment mEditWindowFragment;
     int num=1;
 
@@ -209,7 +214,7 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Log.d("aaaa","position"+position+"id");
+                        Log.d("aaaa","position"+position+"id"+id);
                         mEditWindowFragment=new EditWindowFragment();
                         FragmentTransaction transaction1=getActivity().getSupportFragmentManager().beginTransaction();
                         transaction1.add(R.id.frameLayout,mEditWindowFragment);
@@ -355,19 +360,26 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
                     }
                 });
 
-        mDatabase.collection("roots").document(uid)
-                .collection(title)
-                .add(location)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        mDatabase.collection("locations")
+                .whereEqualTo("title", startDate)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG2, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG2, "Error adding document", e);
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG3, document.getId() + " => " + document.getData());
+
+                                final String uid = getUid();
+                                final String lid = document.getId();
+
+                                mDatabase.collection("roots").document(uid)
+                                        .collection(document.getString("title")).document(lid)
+                                        .set(document.getData());
+                            }
+                        } else {
+                            Log.d(TAG3, "Error getting documents: ", task.getException());
+                        }
                     }
                 });
 
