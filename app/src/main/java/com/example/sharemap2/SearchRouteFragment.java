@@ -7,10 +7,11 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 
 public class SearchRouteFragment extends Fragment{
-    private View view2;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

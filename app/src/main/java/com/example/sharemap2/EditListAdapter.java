@@ -15,7 +15,7 @@ public class EditListAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private int layoutID;
     private ArrayList<Marker> mMarkerList;
-    private ArrayList<String> mbasecommentList;
+    private ArrayList<String> mBaseCommentList;
 
 
     static class ViewHolder {
@@ -23,12 +23,14 @@ public class EditListAdapter extends BaseAdapter {
         TextView text2;
     }
 
+    //コンストラクタ
+    //context,itemLayoutIDというリスト要素の番号,アップロードするためのマーカーリスト,マップに対するコメント
     EditListAdapter(Context context, int itemLayoutId,
                     ArrayList<Marker> MarkerList, ArrayList<String> BaseCommentList){
         inflater = LayoutInflater.from(context);
         layoutID = itemLayoutId;
         mMarkerList= MarkerList;
-        mbasecommentList=BaseCommentList;
+        mBaseCommentList=BaseCommentList;
     }
 
     @Override
@@ -47,9 +49,10 @@ public class EditListAdapter extends BaseAdapter {
         }
 
         holder.text.setText(mMarkerList.get(position).getTitle());
-        if(mbasecommentList!=null){ holder.text2.setText(mbasecommentList.get(position)); }
+        if(mBaseCommentList!=null){ holder.text2.setText(mBaseCommentList.get(position)); }
         return convertView;
     }
+
 
     @Override
     public int getCount() {
@@ -64,6 +67,10 @@ public class EditListAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public void setComment(){
+
     }
 
 }

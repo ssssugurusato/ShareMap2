@@ -1,7 +1,6 @@
 package com.example.sharemap2;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -12,7 +11,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 
-import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -27,7 +25,6 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ListView;
 
 import com.example.sharemap2.model.LocationData;
@@ -78,7 +75,7 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
 
     private ListView mapInfoLayout;
     String provider;
-    private MapsActivity mactivity = null;
+    private MainActivity mactivity = null;
     double lat;
     double lon;
     private  ListView listView;
@@ -212,6 +209,7 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Log.d("aaaa","position"+position+"id");
                         mEditWindowFragment=new EditWindowFragment();
                         FragmentTransaction transaction1=getActivity().getSupportFragmentManager().beginTransaction();
                         transaction1.add(R.id.frameLayout,mEditWindowFragment);
