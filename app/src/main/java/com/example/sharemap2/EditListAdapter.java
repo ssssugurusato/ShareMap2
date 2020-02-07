@@ -49,10 +49,8 @@ public class EditListAdapter extends BaseAdapter {
         }
 
         holder.text.setText(mMarkerList.get(position).getTitle());
-        if(mBaseCommentList!=null){ holder.text2.setText(mBaseCommentList.get(position)); }
         return convertView;
     }
-
 
     @Override
     public int getCount() {
@@ -67,10 +65,6 @@ public class EditListAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         return position;
-    }
-
-    public void setComment(){
-
     }
 
 }
