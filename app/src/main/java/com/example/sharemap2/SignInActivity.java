@@ -122,7 +122,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         writeNewUser(user.getUid(), username, user.getEmail());
 
         // Go to MainActivity
-        startActivity(new Intent(SignInActivity.this, MapsActivity.class));
+        startActivity(new Intent(SignInActivity.this, MainActivity.class));
         finish();
     }
 

@@ -1,7 +1,6 @@
 package com.example.sharemap2;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -12,12 +11,11 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 
-import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,14 +25,11 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.sharemap2.model.LocationData;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -69,16 +64,18 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
     };
     private static final int GRANTED = PackageManager.PERMISSION_GRANTED;
     private List<LatLng> mRunList = new ArrayList<LatLng>();
-    private LatLng latlong, latlong2;
+    private LatLng latlng, latlng2;
     private static Location location1;
     private Button mButton, mButton2, mButton3;
     private Marker userMark;
     // ListViewに表示する項目を生成
     private ArrayList<Marker> mMarkerList= new ArrayList<>();
+    public static ArrayList<String> commentList;
+    private PolylineOptions polyOptions;
 
     private ListView mapInfoLayout;
     String provider;
-    private MapsActivity mactivity = null;
+    private MainActivity mactivity = null;
     double lat;
     double lon;
     private  ListView listView;
@@ -89,15 +86,11 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
     private String created_at;
     private String TAG1 = "Recording current location";
     private String TAG2 = "Recording root";
+    private EditWindowFragment mEditWindowFragment;
+    int num=1;
 
-    @Deprecated
-    @CallSuper
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof MapsActivity) {
-            Log.d("aaa", "OKOKOKOKOKOK");
-        }
-    }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -155,12 +148,9 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
             //基準を満たすプロバイダ名を取得する
             provider = locationmanager1.getBestProvider(criteria, true);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(35.6511494145129, 139.53881523584), 19));
+
             // 最後の位置情報取得
-            location1 = locationmanager1.getLastKnownLocation(provider);
-
-
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLngGet(location1), 19));
-
             mButton = (Button) getActivity().findViewById(R.id.button);
             mButton2 = (Button) getActivity().findViewById(R.id.button2);
             mButton.setOnClickListener(this);
@@ -168,6 +158,7 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
 
             //プロバイダーに基づいた リスナー を登録する
             //最低0秒、最低0mで発火、これより細かい更新はされない
+
 
 
         }
@@ -180,11 +171,12 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
 
             lat = location.getLatitude();
             lon = location.getLongitude();
-            latlong = new LatLng(lat, lon);
-
+            latlng = new LatLng(lat, lon);
+            return latlng;
         }
-        return latlong;
+        return null;
     }
+
 
     public void onClick(View view) {
         switch (view.getId()) {
@@ -193,33 +185,36 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
                         ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[1]) == GRANTED) {
                     locationmanager1.requestLocationUpdates(GPS_PROVIDER, 5000, 0, this);
                     locationmanager1.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, this);
-
                     startDate = getNowDate();
                 }
                 break;
 
             case R.id.button2:
                 locationmanager1.removeUpdates(this);
+                drawTrace(latlng2);
                 mapInfoLayout = getActivity().findViewById(R.id.mapInfoLayout);
                 mButton3=getActivity().findViewById(R.id.button3);
                 mapInfoLayout.setVisibility(View.VISIBLE);
+                mButton3.setVisibility(View.VISIBLE);
                 mButton.setVisibility(View.GONE);
                 mButton2.setVisibility(View.GONE);
-                mButton3.setVisibility(View.VISIBLE);
-
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLngGet(locationmanager1.getLastKnownLocation(provider)), 10));
                 // BaseAdapter を継承したadapterのインスタンスを生成
                 // レイアウトファイル list_items.xml を
                 // activity_main.xml に inflate するためにadapterに引数として渡す
-                final BaseAdapter adapter = new EditListAdapter(getContext(), R.layout.list_items, mMarkerList);
+                final BaseAdapter adapter = new EditListAdapter(getContext(), R.layout.list_items, mMarkerList, commentList);
                 // ListViewにadapterをセット
                 listView.setAdapter(adapter);
+                //リストビューを押したら
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        getActivity().setContentView(R.layout.memo_add);
-                        EditText mEdit=getActivity().findViewById(R.id.editText);
-                        mEdit.getText().toString();
+                        Log.d("aaaa","position"+position+"id");
+                        mEditWindowFragment=new EditWindowFragment();
+                        FragmentTransaction transaction1=getActivity().getSupportFragmentManager().beginTransaction();
+                        transaction1.add(R.id.frameLayout,mEditWindowFragment);
+                        transaction1.addToBackStack(null);
+                        transaction1.commit();
                     }
                 });
            }
@@ -230,8 +225,9 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         //LatLng curr = new LatLng(location.getLatitude(), location.getLongitude());
         //mMap.animateCamera(CameraUpdateFactory.newLatLng(curr));
 
+
         //位置情報とそれに関連する情報の取得
-        latlong2=LatLngGet(location);
+        latlng2=LatLngGet(location);
         accuracy = location.getAccuracy();
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
@@ -239,18 +235,18 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         created_at = currentTime;
 
         //データベースへの書き込みを実行
-        writeToDatabase(latlong2, accuracy, created_at);
+        writeToDatabase(latlng2, accuracy, created_at);
 
-        mRunList.add(latlong2);
+        mRunList.add(latlng2);
         //locationが変わるごとにマークをついか
         userMark = mMap.addMarker(new MarkerOptions()
-                .position(latlong2)
-                .title(latlong2.toString())
+                .position(latlng2)
+                .title("経路"+num)
                 .draggable(true));
         //userMark.setTag(0);
         mMarkerList.add(userMark);
+        num=num+1;
 
-        drawTrace(latlong2);
     }
 
     @Override
@@ -263,8 +259,9 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
     private void drawTrace(LatLng latlng) {
 
         // Set a listener for marker click.
-        mMap.setOnMarkerClickListener(this);
-        PolylineOptions polyOptions = new PolylineOptions();
+        //mMap.setOnMarkerClickListener(this);
+        polyOptions = new PolylineOptions();
+        //mRunListの要素である緯度経度つまりLatLngをポリラインの要素として登録
         for (LatLng polyLatLng : mRunList) {
             polyOptions.add(polyLatLng);
         }
