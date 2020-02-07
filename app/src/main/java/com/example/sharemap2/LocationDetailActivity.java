@@ -1,15 +1,20 @@
 package com.example.sharemap2;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.sharemap2.model.LocationData;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class LocationDetailActivity extends AppCompatActivity implements
             View.OnClickListener,
@@ -24,7 +29,6 @@ public class LocationDetailActivity extends AppCompatActivity implements
         private TextView latitudeView;
         private TextView longitudeView;
 
-
         private FirebaseFirestore mFirestore;
         private DocumentReference mLocationRef;
 
@@ -38,11 +42,11 @@ public class LocationDetailActivity extends AppCompatActivity implements
             latitudeView = findViewById(R.id.lat);
             longitudeView = findViewById(R.id.lng);
 
-            findViewById(R.id.save).setOnClickListener(this);
+            findViewById(R.id.saveFab).setOnClickListener(this);
 
             // Get restaurant ID from extras
-            String restaurantId = getIntent().getExtras().getString(KEY_RESTAURANT_ID);
-            if (restaurantId == null) {
+            String locationsId = getIntent().getExtras().getString(KEY_RESTAURANT_ID);
+            if (locationsId == null) {
                 throw new IllegalArgumentException("Must pass extra " + KEY_RESTAURANT_ID);
             }
 
@@ -54,59 +58,60 @@ public class LocationDetailActivity extends AppCompatActivity implements
         public void onStart() {
             super.onStart();
 
-            mRatingAdapter.startListening();
-            mRestaurantRegistration = mRestaurantRef.addSnapshotListener(this);
         }
 
         @Override
         public void onStop() {
             super.onStop();
-
-            mRatingAdapter.stopListening();
-
-            if (mRestaurantRegistration != null) {
-                mRestaurantRegistration.remove();
-                mRestaurantRegistration = null;
-            }
         }
 
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.restaurant_button_back:
-                    onBackArrowClicked(v);
+                case R.id.saveFab:
+                    onSaveFabClicked(v);
                     break;
-                case R.id.fab_show_rating_dialog:
-                    onAddRatingClicked(v);
+                case R.id.deleteFab:
+                    onDeleteClicked(v);
                     break;
             }
         }
 
-        /**
-         * Listener for the Restaurant document ({@link #mRestaurantRef}).
-         */
+        private void onSaveFabClicked(View v) {
+            UpdateLocationData();
+        }
+
+        private void onDeleteClicked(View v) {
+            RemoveLocationData();
+        }
+
+        private void UpdateLocationData() {
+
+        }
+
+        private void RemoveLocationData() {
+
+        }
+
+    /**
+         * Listener for the location document ({@link #mLocationRef}).
+     **/
         @Override
         public void onEvent(DocumentSnapshot snapshot, FirebaseFirestoreException e) {
             if (e != null) {
-                Log.w(TAG, "restaurant:onEvent", e);
+                Log.w(TAG, "location:onEvent", e);
                 return;
             }
 
-            onRestaurantLoaded(snapshot.toObject(Restaurant.class));
+            onLocationDataLoaded(snapshot.toObject(LocationData.class));
         }
 
-        private void onRestaurantLoaded(Restaurant restaurant) {
-            mNameView.setText(restaurant.getName());
-            mRatingIndicator.setRating((float) restaurant.getAvgRating());
-            mNumRatingsView.setText(getString(R.string.fmt_num_ratings, restaurant.getNumRatings()));
-            mCityView.setText(restaurant.getCity());
-            mCategoryView.setText(restaurant.getCategory());
-            mPriceView.setText(RestaurantUtil.getPriceString(restaurant));
+        private void onLocationDataLoaded(LocationData locationData) {
+            timeView.setText(locationData.getCreated_at());
+            accuracyView.setText("|精度：" + locationData.getAccuracy());
+            latitudeView.setText("|緯度："+ locationData.getLatitude());
+            longitudeView.setText("|経度："+ locationData.getLongitude());
 
-            // Background image
-            Glide.with(mImageView.getContext())
-                    .load(restaurant.getPhoto())
-                    .into(mImageView);
         }
 
         private void hideKeyboard() {
@@ -116,5 +121,5 @@ public class LocationDetailActivity extends AppCompatActivity implements
                         .hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         }
-    }
+
 }
