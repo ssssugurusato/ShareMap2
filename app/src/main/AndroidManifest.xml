@@ -37,6 +37,8 @@
         <activity
             android:name="com.example.sharemap2.MainActivity"
             android:label="@string/title_activity_maps"/>
+        <activity
+            android:name="com.example.sharemap2.LocationDetailActivity"/>
 
 
     </application>
