@@ -1,7 +1,10 @@
 package com.example.sharemap2;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +13,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class LocationDetailActivity extends AppCompatActivity implements
             View.OnClickListener,
@@ -116,5 +120,5 @@ public class LocationDetailActivity extends AppCompatActivity implements
                         .hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         }
-    }
+
 }
