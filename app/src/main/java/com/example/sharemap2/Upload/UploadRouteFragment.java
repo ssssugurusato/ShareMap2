@@ -147,7 +147,6 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
             SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
 
-
         }
     }
 

@@ -1,6 +1,7 @@
 package com.example.sharemap2.Upload;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.example.sharemap2.LocationDetailActivity;
 import com.example.sharemap2.MainActivity;
 import com.example.sharemap2.R;
 import com.example.sharemap2.sqlite.LocationAdapter;
@@ -28,13 +30,12 @@ import com.example.sharemap2.sqlite.LocationOpenHelper;
 import com.google.firebase.firestore.core.Query;
 
 
-public class RouteListFragment extends Fragment {
+public class RouteListFragment extends Fragment implements LocationAdapter.OnLocationSelectedListener {
 
     public  static RouteListFragment createInstance() {
         return new RouteListFragment();
     }
 
-    private ListView listView;
     private RecyclerView mRecyclerView;
     private LocationAdapter mAdapter;
 
@@ -55,7 +56,7 @@ public class RouteListFragment extends Fragment {
         //データベースファイルの削除
         //SQLiteDatabase.deleteDatabase(context.getDatabasePath(locationOpenHelper.getDatabaseName()));
         SQLiteDatabase db = locationOpenHelper.getWritableDatabase();
-        mAdapter = new LocationAdapter(getContext(),getAllItems(db));
+        mAdapter = new LocationAdapter(getContext(),getAllItems(db), this);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -72,4 +73,12 @@ public class RouteListFragment extends Fragment {
 
     }
 
+    @Override
+    public void onLocationSelected(View view, int position) {
+        long id = (long) view.getTag();
+        Log.e("test2", String.valueOf(id));
+        Intent intent = new Intent(getActivity(), LocationDetailActivity.class);
+        intent.putExtra(LocationDetailActivity.KEY_LOCATION_ID, id);
+        startActivity(intent);
+    }
 }

@@ -110,7 +110,7 @@ public class PersonFragment extends Fragment implements LocationsAdapter.OnLocat
     public void onLocationsSelected(DocumentSnapshot locationData) {
 
         Intent intent = new Intent(getActivity(), LocationDetailActivity.class);
-        intent.putExtra(LocationDetailActivity.KEY_RESTAURANT_ID, locationData.getId());
+        intent.putExtra(LocationDetailActivity.KEY_LOCATION_ID, locationData.getId());
 
         startActivity(intent);
 //        overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
