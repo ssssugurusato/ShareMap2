@@ -1,6 +1,5 @@
 package com.example.sharemap2.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +35,7 @@ public class LocationsAdapter extends FirestoreAdapter<LocationsAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        return new ViewHolder(inflater.inflate(R.layout.list_location, parent, false));
+        return new ViewHolder(inflater.inflate(R.layout.list_location_item, parent, false));
     }
 
     @Override

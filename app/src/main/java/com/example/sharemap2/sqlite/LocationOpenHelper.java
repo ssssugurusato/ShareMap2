@@ -16,13 +16,6 @@ public class LocationOpenHelper extends SQLiteOpenHelper {
                     LocationContract.Locations.COL_CREATED_AT + " String," +
                     LocationContract.Locations.COL_UID + " String)";
 
-    public static final String INIT_TABLE =
-            "insert into locations (latitude, longitude, accuracy, created_at, uid) values " +
-                    "(35.689634, 139.692101, 20.00, '2020.02.18', 'takeshi'), " +
-                    "(35.689634, 139.692101, 20.00, '2020.02.18', 'suguru'), " +
-                    "(35.689634, 139.692101, 25.00, '2020.02.16', 'suguru'), " +
-                    "(35.657427, 139.542997, 30.00, '2020.02.17', 'suguru')";
-
     public static final String DROP_TABLE =
             "drop table if exists locations";
 
@@ -37,7 +30,7 @@ public class LocationOpenHelper extends SQLiteOpenHelper {
 //        create table
         db.execSQL(CREATE_TABLE);
 //        init table：初期データの挿入
-        db.execSQL(INIT_TABLE);
+//        db.execSQL(INIT_TABLE);
     }
 
     @Override

@@ -15,37 +15,50 @@ import com.example.sharemap2.R;
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.LocationViewHolder> {
     private Context mContext;
     private Cursor mCursor;
-
-    public LocationAdapter(Context context, Cursor cursor) {
+    private  OnLocationSelectedListener mOnLocationSelectedListener;
+    //
+    public LocationAdapter(Context context, Cursor cursor, OnLocationSelectedListener onLocationSelectedListener) {
         mContext = context;
         mCursor = cursor;
+        mOnLocationSelectedListener = onLocationSelectedListener;
     }
 
 
-    public class LocationViewHolder extends RecyclerView.ViewHolder {
+    public class LocationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView timeView;
         TextView accuracyView;
         TextView latitudeView;
         TextView longitudeView;
+        TextView commentView;
+        OnLocationSelectedListener onLocationSelectedListener;
 
-        public LocationViewHolder(@NonNull View itemView) {
-            //itemのviewの実体
+        public LocationViewHolder(@NonNull View itemView, OnLocationSelectedListener onLocationSelectedListener) {
             super(itemView);
+
             timeView = itemView.findViewById(R.id.created_at);
             accuracyView = itemView.findViewById(R.id.accuracy);
             latitudeView = itemView.findViewById(R.id.lat);
             longitudeView = itemView.findViewById(R.id.lng);
+            commentView = itemView.findViewById(R.id.comment);
+            this.onLocationSelectedListener = onLocationSelectedListener;
+
+            itemView.setOnClickListener(this);
+
+        }
+
+        @Override
+        public void onClick(View v) {
+            onLocationSelectedListener.onLocationSelected(v,getAdapterPosition());
         }
     }
 
     @NonNull
     @Override
     public LocationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //LocationViewHolderはitemのviewでこれを生成
         LayoutInflater Inflater = LayoutInflater.from(mContext);
-        View view = Inflater.inflate(R.layout.list_location, parent, false);
-        return new LocationViewHolder(view);
+        View view = Inflater.inflate(R.layout.list_location_item, parent, false);
+        return new LocationViewHolder(view, mOnLocationSelectedListener);
     }
 
     @Override
@@ -54,15 +67,19 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
             return;
         }
 
+        long id = mCursor.getLong(mCursor.getColumnIndex(LocationContract.Locations._ID));
         double latitude = mCursor.getDouble(mCursor.getColumnIndex(LocationContract.Locations.COL_LATITUDE));
         double longitude = mCursor.getDouble(mCursor.getColumnIndex(LocationContract.Locations.COL_LONGITUDE));
         double accuracy = mCursor.getDouble(mCursor.getColumnIndex(LocationContract.Locations.COL_ACCURACY));
         String created_at = mCursor.getString(mCursor.getColumnIndex(LocationContract.Locations.COL_CREATED_AT));
+        String comment = mCursor.getString(mCursor.getColumnIndex(LocationContract.Locations.COL_COMMENT));
 
-        holder.timeView.setText("計測日時：" + String.valueOf(created_at));
+        holder.itemView.setTag(id);
+        holder.timeView.setText("計測日時：" + created_at);
         holder.accuracyView.setText("|精度：" + accuracy);
-        holder.latitudeView.setText("|緯度："+ latitude);
-        holder.longitudeView.setText("|経度："+ longitude);
+        holder.latitudeView.setText("|緯度：" + latitude);
+        holder.longitudeView.setText("|経度：" + longitude);
+        holder.commentView.setText("|コメント：" + comment);
 
     }
 
@@ -80,5 +97,9 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         if (newCursor != null){
             notifyDataSetChanged();
         }
+    }
+
+    public interface OnLocationSelectedListener {
+        void onLocationSelected(View view, int position);
     }
 }

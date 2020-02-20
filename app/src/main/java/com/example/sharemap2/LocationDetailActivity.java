@@ -1,6 +1,7 @@
 package com.example.sharemap2;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,118 +9,76 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.example.sharemap2.model.LocationData;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 
-public class LocationDetailActivity extends AppCompatActivity implements
-            View.OnClickListener,
-            EventListener<DocumentSnapshot> {
+public class LocationDetailActivity extends AppCompatActivity {
 
-        private static final String TAG = "LocationDetail";
+    private static final String TAG = "LocationDetail";
 
-        public static final String KEY_RESTAURANT_ID = "key_location_id";
+    public static final String KEY_LOCATION_ID = "key_location_id";
 
-        private TextView timeView;
-        private TextView accuracyView;
-        private TextView latitudeView;
-        private TextView longitudeView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_location_detail);
 
-        private FirebaseFirestore mFirestore;
-        private DocumentReference mLocationRef;
+        if(savedInstanceState == null){
+            // FragmentManagerのインスタンス生成
+            FragmentManager fragmentManager = getSupportFragmentManager();
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_location_detail);
+            // FragmentTransactionのインスタンスを取得
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-            timeView = findViewById(R.id.created_at);
-            accuracyView = findViewById(R.id.accuracy);
-            latitudeView = findViewById(R.id.lat);
-            longitudeView = findViewById(R.id.lng);
 
-            findViewById(R.id.saveFab).setOnClickListener(this);
+            // インスタンスに対して張り付け方を指定する
+            fragmentTransaction.replace(R.id.container2, new LocationDetailFragment());
 
-            // Get restaurant ID from extras
-            String locationsId = getIntent().getExtras().getString(KEY_RESTAURANT_ID);
-            if (locationsId == null) {
-                throw new IllegalArgumentException("Must pass extra " + KEY_RESTAURANT_ID);
-            }
-
-            // Initialize Firestore
-            mFirestore = FirebaseFirestore.getInstance();
+            // 張り付けを実行
+            fragmentTransaction.commit();
         }
 
-        @Override
-        public void onStart() {
-            super.onStart();
 
+        // Get restaurant ID from extras
+
+//        if (locationsId == null) {
+//            throw new IllegalArgumentException("Must pass extra " + KEY_LOCATION_ID);
+//        }
+
+    }
+
+//    /**
+//     * Listener for the location document ({@link #mLocationRef}).
+//     **/
+//    @Override
+//    public void onEvent(DocumentSnapshot snapshot, FirebaseFirestoreException e) {
+//        if (e != null) {
+//            Log.w(TAG, "location:onEvent", e);
+//            return;
+//        }
+//
+//        onLocationDataLoaded(snapshot.toObject(Local_LocationData.class));
+//    }
+//
+//    private void onLocationDataLoaded(Local_LocationData locationData) {
+//        timeView.setText(locationData.getCreated_at());
+//        accuracyView.setText("|精度：" + locationData.getAccuracy());
+//        latitudeView.setText("|緯度："+ locationData.getLatitude());
+//        longitudeView.setText("|経度："+ locationData.getLongitude());
+//
+//    }
+
+    private void hideKeyboard() {
+        View view = getCurrentFocus();
+        if (view != null) {
+            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
 
-        @Override
-        public void onStop() {
-            super.onStop();
-        }
-
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.saveFab:
-                    onSaveFabClicked(v);
-                    break;
-                case R.id.deleteFab:
-                    onDeleteClicked(v);
-                    break;
-            }
-        }
-
-        private void onSaveFabClicked(View v) {
-            UpdateLocationData();
-        }
-
-        private void onDeleteClicked(View v) {
-            RemoveLocationData();
-        }
-
-        private void UpdateLocationData() {
-
-        }
-
-        private void RemoveLocationData() {
-
-        }
-
-    /**
-         * Listener for the location document ({@link #mLocationRef}).
-     **/
-        @Override
-        public void onEvent(DocumentSnapshot snapshot, FirebaseFirestoreException e) {
-            if (e != null) {
-                Log.w(TAG, "location:onEvent", e);
-                return;
-            }
-
-            onLocationDataLoaded(snapshot.toObject(LocationData.class));
-        }
-
-        private void onLocationDataLoaded(LocationData locationData) {
-            timeView.setText(locationData.getCreated_at());
-            accuracyView.setText("|精度：" + locationData.getAccuracy());
-            latitudeView.setText("|緯度："+ locationData.getLatitude());
-            longitudeView.setText("|経度："+ locationData.getLongitude());
-
-        }
-
-        private void hideKeyboard() {
-            View view = getCurrentFocus();
-            if (view != null) {
-                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
-                        .hideSoftInputFromWindow(view.getWindowToken(), 0);
-            }
-        }
+//    public getLocationId(locationId){
+//        return locationId;
+//    }
 
 }
