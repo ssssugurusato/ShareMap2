@@ -13,7 +13,7 @@
         android:background="#3cb371">
 
         <Button
-        android:id="@+id/button4"
+        android:id="@+id/memoup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -24,7 +24,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/memotitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="↓コメント欄"
@@ -38,7 +38,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/memoedit"
         android:layout_width="406dp"
         android:layout_height="653dp"
         android:layout_marginTop="75dp"
