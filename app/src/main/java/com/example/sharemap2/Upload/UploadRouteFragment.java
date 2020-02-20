@@ -1,4 +1,4 @@
-package com.example.sharemap2;
+package com.example.sharemap2.Upload;
 
 import android.Manifest;
 import android.content.Context;
@@ -13,6 +13,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -21,12 +22,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 
+import com.example.sharemap2.R;
 import com.example.sharemap2.model.LocationData;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -70,19 +70,18 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
     private List<LatLng> mRunList = new ArrayList<LatLng>();
     private LatLng latlng, latlng2;
     private static Location location1;
-    private Button mButton, mButton2, mButton3;
+    private Button mButton, mButton2;
     private Marker userMark;
     // ListViewに表示する項目を生成
-    private ArrayList<Marker> mMarkerList= new ArrayList<>();
+    private ArrayList<Marker> mMarkerList = new ArrayList<>();
     public static ArrayList<String> commentList;
     private PolylineOptions polyOptions;
 
     private ListView mapInfoLayout;
     String provider;
-    private MainActivity mactivity = null;
     double lat;
     double lon;
-    private  ListView listView;
+
 
     private FirebaseFirestore mDatabase = FirebaseFirestore.getInstance();
     private String startDate;
@@ -92,15 +91,32 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
     private String TAG2 = "Recording root";
     private String TAG3 = "Firestore";
     private EditWindowFragment mEditWindowFragment;
-    int num=1;
+    int num = 1;
+    private List<String> itemtitlelist=new ArrayList<>();
+    private Toolbar toolbar;
 
+    //Activityに実装
+    public interface AdapterInActivity{
+        void AdapterSet(List<String> itemtitlelist);
+    }
+    private AdapterInActivity mAdapterInActivity;
 
-
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        //contextはAdapterInActivityインタフェースのインスタンスがあるか
+        if(context instanceof AdapterInActivity) {
+            mAdapterInActivity= (AdapterInActivity) context;
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_upload_route, container, false);
+        View view = inflater.inflate(R.layout.fragment_upload_route, container, false);
+        toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        toolbar.setTitle("目的地までの経路をアップ！");
+        return view;
     }
 
     @Override
@@ -131,8 +147,6 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
             SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
 
-            // ListViewのインスタンスを生成
-           listView = getActivity().findViewById(R.id.mapInfoLayout);
 
         }
     }
@@ -165,12 +179,11 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
             //最低0秒、最低0mで発火、これより細かい更新はされない
 
 
-
         }
 
     }
 
-    private LatLng LatLngGet(Location location){
+    private LatLng LatLngGet(Location location) {
         if (ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[0]) == GRANTED ||
                 ActivityCompat.checkSelfPermission(getActivity(), LOCATION_PERMISSION[1]) == GRANTED) {
 
@@ -196,33 +209,14 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
 
             case R.id.button2:
                 locationmanager1.removeUpdates(this);
-                drawTrace(latlng2);
-                mapInfoLayout = getActivity().findViewById(R.id.mapInfoLayout);
-                mButton3=getActivity().findViewById(R.id.button3);
-                mapInfoLayout.setVisibility(View.VISIBLE);
-                mButton3.setVisibility(View.VISIBLE);
+                toolbar.setVisibility(View.GONE);
                 mButton.setVisibility(View.GONE);
                 mButton2.setVisibility(View.GONE);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLngGet(locationmanager1.getLastKnownLocation(provider)), 10));
-                // BaseAdapter を継承したadapterのインスタンスを生成
-                // レイアウトファイル list_items.xml を
-                // activity_main.xml に inflate するためにadapterに引数として渡す
-                final BaseAdapter adapter = new EditListAdapter(getContext(), R.layout.list_items, mMarkerList, commentList);
-                // ListViewにadapterをセット
-                listView.setAdapter(adapter);
-                //リストビューを押したら
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Log.d("aaaa","position"+position+"id"+id);
-                        mEditWindowFragment=new EditWindowFragment();
-                        FragmentTransaction transaction1=getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction1.add(R.id.frameLayout,mEditWindowFragment);
-                        transaction1.addToBackStack(null);
-                        transaction1.commit();
-                    }
-                });
-           }
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.list_frame, RouteListFragment.createInstance());
+                transaction.addToBackStack(null);
+                transaction.commit();
+        }
     }
 
     @Override
@@ -232,7 +226,7 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
 
 
         //位置情報とそれに関連する情報の取得
-        latlng2=LatLngGet(location);
+        latlng2 = LatLngGet(location);
         accuracy = location.getAccuracy();
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
@@ -246,11 +240,12 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         //locationが変わるごとにマークをついか
         userMark = mMap.addMarker(new MarkerOptions()
                 .position(latlng2)
-                .title("経路"+num)
+                .title("経路" + num)
                 .draggable(true));
         //userMark.setTag(0);
         mMarkerList.add(userMark);
-        num=num+1;
+        itemtitlelist.add(num+"個目の位置情報");
+        num = num + 1;
 
     }
 
@@ -386,7 +381,7 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    public static String getNowDate(){
+    public static String getNowDate() {
         final DateFormat df = new SimpleDateFormat("yyyy.MM.dd.HH:mm:ss");
         final Date date = new Date(System.currentTimeMillis());
         return df.format(date);
@@ -396,4 +391,8 @@ public class UploadRouteFragment extends Fragment implements OnMapReadyCallback,
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
+
+
+
 }
+

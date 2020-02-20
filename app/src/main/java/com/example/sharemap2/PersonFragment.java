@@ -57,6 +57,18 @@ public class PersonFragment extends Fragment implements LocationsAdapter.OnLocat
                                 .whereEqualTo("uid", FirebaseAuth.getInstance().getUid())
                                 .whereEqualTo("title", document.getString("title"))
                                 .orderBy("created_at", Query.Direction.DESCENDING);
+
+                        mAdapter = new LocationsAdapter(mQuery, com.example.sharemap2.PersonFragment.this) {
+                            @Override
+                            protected void onDataChanged() {
+                                // Show/hide content if the query returns empty.
+                                if (getItemCount() == 0) {
+                                    mRecyclerView.setVisibility(View.GONE);
+                                } else {
+                                    mRecyclerView.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        };
                     }
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
@@ -64,34 +76,22 @@ public class PersonFragment extends Fragment implements LocationsAdapter.OnLocat
             }
         });
 
-//        mQuery = mFirestore.collection("roots")
+//        mQuery = mFirestore.collection("routes")
 //                .whereEqualTo("uid", FirebaseAuth.getInstance().getUid())
 //                .orderBy("created_at", Query.Direction.DESCENDING)
 //                .limit(LIMIT)
         ;
 
-        mAdapter = new LocationsAdapter(mQuery, this) {
-            @Override
-            protected void onDataChanged() {
-                // Show/hide content if the query returns empty.
-                if (getItemCount() == 0) {
-                    mRecyclerView.setVisibility(View.GONE);
-                } else {
-                    mRecyclerView.setVisibility(View.VISIBLE);
-                }
-            }
 
-            @Override
+          /*  @Override
             protected void onError(FirebaseFirestoreException e) {
                 // Show a snackbar on errors
 //                Snackbar.make(findViewById(android.R.id.content),
 //                        "Error: check logs for info.", Snackbar.LENGTH_LONG).show();
             }
         };
-
+          */
 //        mAdapterをmRecyclerViewにセットする
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setAdapter(mAdapter);
 
         return view;
     }
